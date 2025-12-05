@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NECROMANCER | DO NOT ENTER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Cinzel:wght@400;700&family=Fira+Code:wght@400;600&family=Nosifer&family=Rubik+Glitch&family=Metal+Mania&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              blood: {
+                50: '#fff1f2',
+                100: '#ffe4e6',
+                500: '#ff0000',
+                600: '#dc2626',
+                700: '#8a0000',
+                800: '#600000',
+                900: '#400000',
+                950: '#200000',
+              },
+              rot: {
+                400: '#4ade80',
+                500: '#00ff00',
+                600: '#16a34a',
+                900: '#0f3912',
+                950: '#051405',
+              },
+              pumpkin: {
+                400: '#fbbf24',
+                500: '#f97316',
+                600: '#ea580c',
+                900: '#7c2d12',
+                950: '#431407',
+              },
+              void: '#000000',
+            },
+            fontFamily: {
+              horror: ['Nosifer', 'cursive'],
+              creep: ['Creepster', 'cursive'],
+              ritual: ['Cinzel', 'serif'],
+              code: ['Fira Code', 'monospace'],
+              glitch: ['Rubik Glitch', 'cursive'],
+              metal: ['Metal Mania', 'cursive'],
+            },
+            animation: {
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'flicker': 'flicker 0.1s infinite',
+              'glitch': 'glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite',
+              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+              'terror': 'terror 0.2s infinite',
+              'drift': 'drift 3s ease-in-out infinite',
+              'psychosis': 'psychosis 5s infinite',
+            },
+            keyframes: {
+              flicker: {
+                '0%, 100%': { opacity: 1 },
+                '33%': { opacity: 0.8 },
+                '66%': { opacity: 0.4 },
+                '77%': { opacity: 0.1 },
+              },
+              glitch: {
+                '0%': { transform: 'translate(0)' },
+                '20%': { transform: 'translate(-2px, 2px)' },
+                '40%': { transform: 'translate(-2px, -2px)' },
+                '60%': { transform: 'translate(2px, 2px)' },
+                '80%': { transform: 'translate(2px, -2px)' },
+                '100%': { transform: 'translate(0)' },
+              },
+              shake: {
+                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+              },
+              terror: {
+                '0%': { filter: 'invert(0)' },
+                '50%': { filter: 'invert(1) hue-rotate(180deg)' },
+                '100%': { filter: 'invert(0)' }
+              },
+              drift: {
+                '0%, 100%': { transform: 'rotate(0deg) scale(1)' },
+                '50%': { transform: 'rotate(0.5deg) scale(1.01)' }
+              },
+              psychosis: {
+                '0%': { filter: 'hue-rotate(0deg) blur(0px)' },
+                '25%': { filter: 'hue-rotate(10deg) blur(1px)' },
+                '50%': { filter: 'hue-rotate(-10deg) blur(0.5px) contrast(1.2)' },
+                '75%': { filter: 'hue-rotate(5deg) blur(0px)' },
+                '100%': { filter: 'hue-rotate(0deg) blur(0px)' }
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #000000;
+        color: #e5e5e5;
+        overflow-x: hidden;
+        cursor: crosshair;
+      }
+      
+      /* Intense CRT */
+      .scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(
+          to bottom,
+          rgba(255,0,0,0.02),
+          rgba(255,0,0,0.02) 50%,
+          rgba(0,0,0,0.5) 50%,
+          rgba(0,0,0,0.5)
+        );
+        background-size: 100% 4px;
+        z-index: 50;
+        pointer-events: none;
+      }
+
+      /* Moving Noise */
+      .noise {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+        z-index: 45;
+        pointer-events: none;
+        opacity: 0.15;
+        animation: shiftNoise 0.2s infinite;
+      }
+
+      @keyframes shiftNoise {
+        0% { transform: translate(0,0) }
+        10% { transform: translate(-5%,-5%) }
+        20% { transform: translate(-10%,5%) }
+        30% { transform: translate(5%,-10%) }
+        40% { transform: translate(-5%,15%) }
+        50% { transform: translate(-10%,5%) }
+        60% { transform: translate(15%,0) }
+        70% { transform: translate(0,10%) }
+        80% { transform: translate(-15%,0) }
+        90% { transform: translate(10%,5%) }
+        100% { transform: translate(5%,0) }
+      }
+
+      /* Chromatic Aberration */
+      .chromatic-aberration {
+        text-shadow: 2px 0 #ff0000, -2px 0 #00ff00;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #000; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #300000; 
+        border: 1px solid #ff0000;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #600000; 
+      }
+
+      .blood-drip {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        background: linear-gradient(180deg, rgba(138,0,0,0.8) 0%, rgba(138,0,0,0) 100%);
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M0,0 v50 q50,50 100,0 t100,0 t100,0 t100,0 t100,0 t100,0 t100,0 t100,0 t100,0 t100,0 v-50 z' fill='black'/%3E%3C/svg%3E");
+        z-index: 40;
+        pointer-events: none;
+        animation: drip 10s infinite alternate;
+      }
+
+      @keyframes drip {
+        from { transform: translateY(-50px); opacity: 0.5; }
+        to { transform: translateY(-20px); opacity: 0.8; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.30.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "react": "https://esm.sh/react@^19.2.1",
+    "lucide-react": "https://esm.sh/lucide-react@^0.555.0",
+    "jszip": "https://esm.sh/jszip@^3.10.1",
+    "react-markdown": "https://esm.sh/react-markdown@9?bundle"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

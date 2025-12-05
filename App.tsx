@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Skull, Ghost, Flame, BookOpen, Volume2, VolumeX, Activity, Syringe, Brain, Mic, Play, Pause, Square, Upload, History as HistoryIcon, X, ShieldCheck, Scroll, Zap, Download, Layers, MessageSquare } from 'lucide-react';
+import { Skull, Ghost, Flame, BookOpen, Volume2, VolumeX, Activity, Syringe, Brain, Mic, Play, Pause, Square, Upload, History as HistoryIcon, X, ShieldCheck, Scroll, Zap, Download, Layers, MessageSquare, Copy, Check } from 'lucide-react';
 import { resurrectCode, createNecromancerChat } from './services/geminiService';
 import { LoadingState, TranslationMode, HistoryItem } from './types';
 import { Chat, GenerateContentResponse } from "@google/genai";
@@ -392,6 +392,10 @@ const App: React.FC = () => {
   // TTS State
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  
+  // Copy feedback state
+  const [copiedLeft, setCopiedLeft] = useState(false);
+  const [copiedRight, setCopiedRight] = useState(false);
   
   // Mouse Tracking for Watcher
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -1071,7 +1075,7 @@ const App: React.FC = () => {
               </div>
             )}
 
-            <div className="relative h-full border border-blood-800/50 bg-black/95 rounded-sm flex flex-col shadow-[0_0_50px_rgba(220,38,38,0.1)]">
+            <div className="relative h-full border-2 border-blood-700 bg-black/95 rounded-sm flex flex-col shadow-[0_0_60px_rgba(220,38,38,0.3)]">
               <div className="flex items-center justify-between p-4 border-b border-blood-900 bg-blood-950/20">
                 <div className="flex items-center gap-3">
                   <Skull className="w-6 h-6 text-blood-700 animate-[pulse_3s_infinite]" />
@@ -1101,10 +1105,10 @@ const App: React.FC = () => {
                 
                 <div className="grid grid-cols-2 gap-4 relative z-10">
                   <div className="space-y-2">
-                    <label className="text-blood-800 text-xs font-ritual tracking-widest uppercase flex items-center gap-2">
-                      <span className="w-2 h-2 bg-blood-900 rotate-45"></span> Source
+                    <label className="text-blood-500 text-xs font-ritual tracking-widest uppercase flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blood-600 rotate-45"></span> Source
                     </label>
-                    <div className="border border-blood-900/40 p-2 bg-black/80">
+                    <div className="border border-blood-600 p-2 bg-blood-950/40">
                        <SpookySelect 
                           options={SOURCE_LANGUAGES}
                           value={sourceLang}
@@ -1114,34 +1118,41 @@ const App: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-blood-800 text-xs font-ritual tracking-widest uppercase flex items-center gap-2">
+                    <label className="text-blood-500 text-xs font-ritual tracking-widest uppercase flex items-center gap-2">
                       <BookOpen className="w-3 h-3" /> Grimoire
                     </label>
-                    <div className="border border-blood-900/40 p-2 bg-black/80">
-                       <select 
-                         className="w-full bg-transparent border-none outline-none font-code text-sm tracking-wide text-blood-500 appearance-none cursor-pointer"
+                    <div className="border border-blood-600 p-2 bg-blood-950/40">
+                       <SpookySelect 
+                         options={EXAMPLES.map(ex => ({ label: ex.name, value: ex.id }))}
                          onChange={(e) => loadExample(e.target.value)}
-                         defaultValue=""
-                       >
-                         <option value="" disabled>-- Summon --</option>
-                         {EXAMPLES.map(ex => (
-                           <option key={ex.id} value={ex.id} className="bg-black text-xs">
-                             {ex.name}
-                           </option>
-                         ))}
-                       </select>
+                         placeholder="-- Summon --"
+                         variant="blood"
+                       />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2 flex-grow flex flex-col z-10">
-                   <div className="flex-grow border border-blood-900/40 p-1 bg-black/80 relative transition-colors">
+                   <div className="flex-grow border border-blood-600 p-1 bg-blood-950/40 relative transition-colors">
                     <SpookyTextArea
                       value={sourceCode}
                       onChange={(e) => { setSourceCode(e.target.value); handleInputShake(); }}
                       placeholder="DRAG A FILE HERE OR PASTE THE ROTTING CARCASS..."
                       variant="blood"
                     />
+                    {sourceCode && (
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(sourceCode);
+                          setCopiedLeft(true);
+                          setTimeout(() => setCopiedLeft(false), 2000);
+                        }}
+                        className="absolute top-3 right-3 p-2 text-blood-500 hover:text-blood-300 bg-blood-950/80 rounded border border-blood-700 hover:border-blood-500 hover:bg-blood-900/50 transition-all shadow-lg z-20"
+                        title="Copy to clipboard"
+                      >
+                        {copiedLeft ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -1302,6 +1313,19 @@ const App: React.FC = () => {
                       }
                       variant={displayMode === TranslationMode.AUTOPSY ? 'blood' : 'rot'}
                     />
+                    {resultCode && (
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(resultCode);
+                          setCopiedRight(true);
+                          setTimeout(() => setCopiedRight(false), 2000);
+                        }}
+                        className={`absolute top-3 right-3 p-2 ${displayMode === TranslationMode.AUTOPSY ? 'text-blood-500 hover:text-blood-300 bg-blood-950/80 border-blood-700 hover:border-blood-500 hover:bg-blood-900/50' : 'text-rot-500 hover:text-rot-300 bg-rot-950/80 border-rot-600 hover:border-rot-400 hover:bg-rot-900/50'} rounded border transition-all z-40 shadow-lg`}
+                        title="Copy to clipboard"
+                      >
+                        {copiedRight ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+                      </button>
+                    )}
                   </div>
                 </div>
                 
